@@ -7,7 +7,7 @@
     EDIT THE BASE URL BELOW to match your GitHub repo.
 ]]
 
-local BASE = "https://raw.githubusercontent.com/ANONIMCHR/NX-BRUTAL/main/"
+local BASE = "https://github.com/ANONIMCHR/cheat-nx-baru/"
 
 local function loadMod(path)
     local url = BASE .. path
