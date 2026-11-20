@@ -1,0 +1,25 @@
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temp files
+*.tmp
+*.bak
+*~
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Lua build artifacts
+*.luac
+*.out
+
+# Secrets (do NOT commit real key lists here)
+keys/loginkey.JSON

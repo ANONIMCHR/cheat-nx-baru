@@ -1,0 +1,16 @@
+{
+  "keys": {
+    "NX-TRIAL-001": {
+      "tier": "trial",
+      "expires": "2026-12-31T23:59:59"
+    },
+    "NX-PREMIUM-001": {
+      "tier": "premium",
+      "expires": "2027-06-30T23:59:59"
+    },
+    "NX-LIFETIME-CHRIS": {
+      "tier": "lifetime",
+      "expires": "2099-12-31T23:59:59"
+    }
+  }
+}
