@@ -2,44 +2,59 @@
     NX CHEAT ENGINE V4  |  MUSCLE LEGENDS BRUTAL
     Entry point. Paste this into your executor OR load via:
 
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/USER/REPO/main/main.lua"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ANONIMCHR/cheat-nx-baru/main/main.lua"))()
 
-    EDIT THE BASE URL BELOW to match your GitHub repo.
+    Loader auto-detects module location:
+      - tries  <BASE>src/<name>   first
+      - falls back to <BASE><name>  (root)
+    Works whether modules live in src/ or at repo root.
 ]]
 
-local BASE = "https://github.com/ANONIMCHR/cheat-nx-baru/"
+local BASE = "https://raw.githubusercontent.com/ANONIMCHR/cheat-nx-baru/main/"
 
-local function loadMod(path)
-    local url = BASE .. path
-    local ok, src = pcall(function() return game:HttpGet(url) end)
-    if not ok or not src or #src < 10 then
-        error("[NX] FAILED TO FETCH: " .. path .. " (" .. tostring(src) .. ")")
+local function tryFetch(url)
+    local ok, body = pcall(function() return game:HttpGet(url) end)
+    if not ok or not body or #body < 10 then return nil end
+    local head = body:sub(1, 3)
+    if head == "404" or head == "Not" then return nil end
+    return body
+end
+
+local function loadMod(name)
+    local src = tryFetch(BASE .. "src/" .. name)
+    local from = "src/"
+    if not src then
+        src = tryFetch(BASE .. name)
+        from = "root"
     end
-    local fn, err = loadstring(src, "=" .. path)
+    if not src then
+        error("[NX] FAILED TO FETCH: " .. name .. " (not in src/ nor root)")
+    end
+    local fn, err = loadstring(src, "=" .. name)
     if not fn then
-        error("[NX] SYNTAX ERROR in " .. path .. ": " .. tostring(err))
+        error("[NX] SYNTAX ERROR in " .. name .. " (" .. from .. "): " .. tostring(err))
     end
     local ok2, result = pcall(fn)
     if not ok2 then
-        error("[NX] RUNTIME ERROR in " .. path .. ": " .. tostring(result))
+        error("[NX] RUNTIME ERROR in " .. name .. " (" .. from .. "): " .. tostring(result))
     end
     return result
 end
 
 -- Load in dependency order
 local CONFIG    = loadMod("config.lua")
-local Services  = loadMod("src/services.lua")
-local Palette   = loadMod("src/palette.lua")
-local State     = loadMod("src/state.lua")(CONFIG)
-local Utils     = loadMod("src/utils.lua")(Services, State)
-local Remotes   = loadMod("src/remotes.lua")(Services, State, Utils)
-local Features  = loadMod("src/features.lua")(Services, State, Utils, Remotes)
-local Character = loadMod("src/character.lua")(Services, State, Utils)
-local Driver    = loadMod("src/driver.lua")(Services, State, Utils, Remotes, Features, Character)
-local Widget    = loadMod("src/widget.lua")(Services, Palette)
-local UI        = loadMod("src/ui.lua")(Services, Palette, State, Utils, Widget, CONFIG)
-local KeyGate   = loadMod("src/keygate.lua")(Services, Palette, State, Utils, Widget, CONFIG)
-local Boot      = loadMod("src/boot.lua")(Services, Palette, State, Utils, Remotes, Features, Character, Driver, UI, CONFIG)
+local Services  = loadMod("services.lua")
+local Palette   = loadMod("palette.lua")
+local State     = loadMod("state.lua")(CONFIG)
+local Utils     = loadMod("utils.lua")(Services, State)
+local Remotes   = loadMod("remotes.lua")(Services, State, Utils)
+local Features  = loadMod("features.lua")(Services, State, Utils, Remotes)
+local Character = loadMod("character.lua")(Services, State, Utils)
+local Driver    = loadMod("driver.lua")(Services, State, Utils, Remotes, Features, Character)
+local Widget    = loadMod("widget.lua")(Services, Palette)
+local UI        = loadMod("ui.lua")(Services, Palette, State, Utils, Widget, CONFIG)
+local KeyGate   = loadMod("keygate.lua")(Services, Palette, State, Utils, Widget, CONFIG)
+local Boot      = loadMod("boot.lua")(Services, Palette, State, Utils, Remotes, Features, Character, Driver, UI, CONFIG)
 
 -- Cleanup old instance
 if getgenv and getgenv().NX_ML_BRUTAL_LOADED then
